@@ -12,9 +12,10 @@ from settings import LABEL_FONT_K, TEXT_FONT_K, PART_K, PHOTO_K, MAX_LINE_WIDTH,
 UKRAINIAN_LOWERCASE = 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'
 ALLOWED_LETTERS = string.printable + UKRAINIAN_LOWERCASE + UKRAINIAN_LOWERCASE.upper()
 COLORS = ('red', 'blue', 'green', 'yellow', 'magenta', 'pink', 'lime')
+FONT_NAME = 'fonts/arial.ttf'
 
 
-@dataclass(slots=True)
+@dataclass
 class Rect:
     left: int = 0
     top: int = 0
@@ -64,7 +65,7 @@ def create_fictive_photo(first_name: str, last_name: str, photo_width: int) -> I
     initials = generate_initials((first_name, last_name))
     if initials:
         photo_draw = ImageDraw.Draw(photo_image)
-        photo_font = ImageFont.truetype("arial", size=int(0.5 * photo_width))
+        photo_font = ImageFont.truetype(FONT_NAME, size=int(0.5 * photo_width))
         photo_rect = Rect(0, 0, photo_width, photo_width)
         draw_text_in_center(initials, photo_font, photo_rect, photo_draw, align='center')
     return photo_image
@@ -123,8 +124,8 @@ def generate_image(username: str, first_name: str, last_name: str,
 
     left_part_width = int(PART_K * w)
     text_font_size = int(TEXT_FONT_K * h)
-    text_font = ImageFont.truetype("arial", size=text_font_size)
-    label_font = ImageFont.truetype("arial", size=int(LABEL_FONT_K * text_font_size))
+    text_font = ImageFont.truetype(FONT_NAME, size=text_font_size)
+    label_font = ImageFont.truetype(FONT_NAME, size=int(LABEL_FONT_K * text_font_size))
 
     draw = ImageDraw.Draw(background_image)
 
