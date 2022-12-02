@@ -1,16 +1,14 @@
 import random
-import string
 import textwrap
 from dataclasses import dataclass
 from datetime import datetime
 from typing import BinaryIO, Optional, Iterable
 
+import emoji
 from PIL import Image, ImageDraw, ImageFont
 
 from settings import LABEL_FONT_K, TEXT_FONT_K, PART_K, PHOTO_K, MAX_LINE_WIDTH, MAX_LINE_COUNT
 
-UKRAINIAN_LOWERCASE = 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'
-ALLOWED_LETTERS = string.printable + UKRAINIAN_LOWERCASE + UKRAINIAN_LOWERCASE.upper()
 COLORS = ('red', 'blue', 'green', 'yellow', 'magenta', 'pink', 'lime')
 FONT_NAME = 'fonts/arial.ttf'
 
@@ -49,14 +47,8 @@ def draw_text_in_center(text: str, font: ImageFont, target_rect: Rect, draw: Ima
 
 
 def generate_initials(names: Iterable[str]):
-    initials = []
-    for name in names:
-        if name:
-            for ch in name:
-                if ch in ALLOWED_LETTERS:
-                    initials.append(ch)
-                    break
-    return "".join(initials)
+    names = map(lambda name: emoji.replace_emoji(name, replace='').strip(), names)
+    return "".join((name[0] for name in names if name))
 
 
 def create_fictive_photo(first_name: str, last_name: str, photo_width: int) -> Image.Image:
@@ -108,7 +100,8 @@ def draw_right_part(text: str,
                     rect: Rect,
                     font: ImageFont,
                     draw: ImageDraw):
-    lines = textwrap.wrap(text, width=max_line_width)
+    lines = textwrap.wrap(emoji.replace_emoji(text, ' ').strip(),
+                          width=max_line_width)
     if len(lines) > max_line_count:
         lines = lines[:max_line_count - 1]
         lines.append('...'.center(max_line_width))
