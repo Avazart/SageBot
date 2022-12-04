@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import random
 import sys
 from logging import getLogger, Logger
@@ -9,6 +10,7 @@ from typing import NamedTuple, Optional
 
 import click
 import colorama
+from dotenv import dotenv_values
 
 import click_utils
 from add import add_images
@@ -33,26 +35,35 @@ def init_logging(work_dir: Path):
 
 
 @click.group(invoke_without_command=True)
-@click.option('--work_dir', '-wd', type=Path, default='user_data')
+@click.option('--work_dir', '-wd', type=Path, default=None)
 @click.pass_context
 def command_group(context, work_dir: Path):
-    if not work_dir.exists():
-        work_dir.mkdir()
+    environment = os.environ if not __debug__ else dotenv_values(".env")
+    work_dir = work_dir or Path(environment.get('WORK_DIR') or 'user_data')
     init_logging(work_dir)
     context.obj['logger'] = getLogger('main')
+    context.obj['environment'] = environment
     context.obj['work_dir'] = work_dir
+    if not work_dir.exists():
+        work_dir.mkdir()
     if context.invoked_subcommand is None:
         context.invoke(command_run)
 
 
 @command_group.command(name='run')
 @click.pass_context
-@click.option('--token', '-t', type=str, required=True)
+@click.option('--token', '-t', type=str, default=None)
 @click.option('--groups', '-gs', multiple=True, type=str, default=[])
 @click_utils.log_work_process('main')
 def command_run(context, token: str, groups: list[str]):
     work_dir: Path = context.obj['work_dir']
     logger: Logger = context.obj['logger']
+    token = token or context.obj['environment'].get('TOKEN')
+    if not groups:
+        if groups_from_env := context.obj['environment'].get('GROUPS'):
+            groups = groups_from_env.split(',')
+    if token is None:
+        raise RuntimeError('The api token is not specified!')
     groups = frozenset((TgGroup(*map(int, s.split('/'))) for s in groups))
     asyncio.run(run_bot(token, groups, work_dir, logger))
 
