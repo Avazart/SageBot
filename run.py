@@ -63,6 +63,8 @@ async def on_quote(message: Message, context: dict):
         images_path = work_dir / 'background_images'
         background_images = [path for path in images_path.glob('*.jpeg')
                              if not path.stem.endswith('_test')]
+        if len(background_images) == 0:
+            raise RuntimeError('Not found background images!')
         background_file_path = random.choice(background_images)
         args = message.reply_to_message, photo_data, background_file_path
         buffered_input_file = await loop.run_in_executor(executor, generation_task, *args)
