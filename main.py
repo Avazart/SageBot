@@ -29,8 +29,8 @@ def init_logging(work_dir: Path):
     log_config_path = LOG_CONFIG_FILE_PATH_FMT.format('_debug' if __debug__ else '')
     with open(log_config_path) as file:
         config = json.load(file)
-        file_handler = config['handlers']['FileHandler']
-        file_handler['filename'] = str(logs_path / 'log.txt')
+        if file_handler := config['handlers'].get('FileHandler'):
+            file_handler['filename'] = str(logs_path / 'log.txt')
         dictConfig(config)
 
 

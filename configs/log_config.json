@@ -25,18 +25,6 @@
             "class": "logging.StreamHandler",
             "formatter": "ColoredFormatter",
 			"level": "INFO"
-        },		
-	
-        "FileHandler":
-		{
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "formatter": "TimeStampFormatter",
-            "filename": "log.txt",
-			"when": "D",
-			"interval": 1,
-			"backupCount": 5,
-			"level": "WARNING",
-			"encoding": "UTF-8"
         }
     },
     
@@ -44,7 +32,7 @@
 	{
         "root":
 		{
-            "handlers": [ "FileHandler" ],
+            "handlers": [],
             "level": "INFO"
         },
 
